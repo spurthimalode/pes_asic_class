@@ -1,17 +1,7 @@
 # VLSI Physical Design for ASICs
 ## OBJECTIVE
 The objective of a course in VLSI (Very Large Scale Integration) Physical Design for ASICs (Application-Specific Integrated Circuits) is to provide us with the knowledge and skills needed to design and implement custom integrated circuits efficiently and effectively. ASICs are specialized integrated circuits designed for specific applications, and physical design in the context of VLSI refers to the process of translating a high-level logic or functional description of a circuit into a physical layout that can be fabricated as a semiconductor device.
-
-<details>
-<summary>SKILL OUTCOMES </summary>
-+ Architectural Design
-+ RTL Design / Behavioral Modeling
-+ Floorplanning
-+ Placement
-+ Clock Tree Synthesis
-+ Routing
-</details>
-
+<img width="500" alt="image" src="https://github.com/spurthimalode/pes_asic_class/assets/142222859/f2d490a5-7763-4946-a1a1-906e59c7c87c">
 ## INSTALLATION
 + git clone https://github.com/kunalg123/riscv_workshop_collaterals
 + cd riscv_workshop_collaterals
@@ -24,22 +14,19 @@ The objective of a course in VLSI (Very Large Scale Integration) Physical Design
 <br>
 	
 [](https://github.com/spurthimalode/PES_ASIC_CLASS#links-for-easy-navigation)
-*Introduction to RISCV ISA and GNU Compiler Toolchain*
-+ Introduction to Basic Keywords
-+ Labwork for RISCV Toolchain
-+ Integer Number Representation 
+**Introduction to RISCV ISA and GNU Compiler Toolchain**
 <details>
 <summary> Introduction </summary>
-	
-- *ISA (Instruction Set Archhitecture)*
+	<img width="500" alt="image" src="https://github.com/spurthimalode/pes_asic_class/assets/142222859/b93f1302-4b14-47af-bf81-76761782a4c9"><br>
+
+- **ISA (Instruction Set Architecture)**
   - ISA defines the interface between a computer's hardware and its software, specifically how the processor and its components interact with the software instructions that drive the execution of tasks.
   - It encompasses a set of instructions, addressing modes, data types, registers, memory organization, and the mechanisms for executing and managing instructions.
 
-- *RISC-V (Reduced Instruction Set Computing - Five)*.
+- **RISC-V (Reduced Instruction Set Computing - Five)**.
   - It is an open-source Instruction Set Architecture (ISA) that has gained significant attention and adoption in the world of computer architecture and semiconductor design.
   - RISC architectures simplify the instruction set by focusing on a smaller set of instructions, each of which can be executed in a single clock cycle. This approach usually leads to faster execution of individual instructions. 
 
-<img width="536" alt="image" src="https://github.com/Veda1809/pes_asic_class/assets/142098395/4eabe0b7-4581-419b-88e7-84c7ac1dac8e">
     </details>
 <details>
 <summary>Apps to Hardware</summary>
@@ -56,11 +43,10 @@ The objective of a course in VLSI (Very Large Scale Integration) Physical Design
 ## Labwork for RISCV Toolchain
 ### Problem Statement
 Write a C program for calculating the sum from 1 to N using leafpad text editor.
-
-c
+```
 leafpad sum1ton.c
-
- c
+```
+``` 
 #include<stdio.h>
 
 int main(){
@@ -71,60 +57,58 @@ int main(){
 	printf("Sum of numbers from 1 to %d is %d \n",n,sum);
 	return 0;
 }
-
-<img width="545" alt="image" src="https://github.com/spurthimalode/pes_asic_class/assets/142222859/80f7e05b-1cf5-4df9-a4e1-e454c720dade">
+```
+<img width="545" alt="image" src="https://github.com/spurthimalode/pes_asic_class/assets/142222859/ab16be32-477c-4a39-b5e8-0a721e415f05">
 
 By means of the GCC compiler, the program was processed, leading to the generation of its output.
 
-c
+```
 gcc sumton.c
 .\a.out
+```
 
-
-<img width="545" alt="image" src="https://github.com/spurthimalode/pes_asic_class/assets/142222859/2a2ba71c-3925-46e1-b65d-d21198bbc6da">
+<img width="545" alt="image" src="https://github.com/spurthimalode/pes_asic_class/assets/142222859/0ec1c331-563e-41ec-9ffa-01bef5084ab8">
 
 ## RISCV GCC Compiler and Dissemble
 
 Using the riscv gcc compiler, we compiled the C program.
-
-c
+```
 riscv64-unknown-elf-gcc -O1 -mabi=lp64 -march=rv64i -o sum1ton.o sum1ton.c
-
+```
 
 Using `ls -ltr sum1ton.o`, we can check if the object file is created.
 
 To get the dissembled ALP code for the C program, 
-
-c
+```
 riscv64-unknown-elf-objdump -d sum1ton.o | less
-
+```
 
 In order to view the main section, type 
 `/main`.
 
 Using -O1 optimisation, the number of instructions are 14.
 
-<img width="453" alt="image" src="https://github.com/spurthimalode/pes_asic_class/assets/142222859/5ed25dcf-4fe6-4077-a408-15573ebd9351">
+<img width="453" alt="image" src="https://github.com/spurthimalode/pes_asic_class/assets/142222859/b1ffdd31-93cb-4dfc-80e4-6a63056643c2">
 
 
 Using -Ofast optimisation, we can see that the number of instructions have been reduced to 11.
 
-<img width="453" alt="image" src="https://github.com/spurthimalode/pes_asic_class/assets/142222859/5ae7b61f-eb1c-4840-8d83-a5c26b2ba0ec">
+<img width="453" alt="image" src="https://github.com/spurthimalode/pes_asic_class/assets/142222859/43d95b26-1d17-45f3-b0dc-53ee4e099eb7">
 
 ## Spike Simulation and Debug
 
 `spike pk sum1ton.o`serves as a means to verify that the instructions generated from the compiled `sum1ton.o` program are functioning correctly and producing the expected output
 
-<img width="523" alt="image" src="https://github.com/spurthimalode/pes_asic_class/assets/142222859/c0e4a29e-77c8-49d5-aa2e-95c6a836e35f">
+<img width="523" alt="image" src="https://github.com/spurthimalode/pes_asic_class/assets/142222859/b1260696-31a0-47d3-9b28-9f809dc19be8">
 
 For debugging use
-c
+```
 spike -d pk sum1ton.c
- 
+```
 
 The contents of the registers can be viewed.
 
-<img width="523" alt="image" src="https://github.com/spurthimalode/pes_asic_class/assets/142222859/83fce150-9e10-4362-8921-42c293cf40bd">
+<img width="523" alt="image" src="https://github.com/spurthimalode/pes_asic_class/assets/142222859/24b1c88a-5709-4640-8e9f-f706b077bc8b">
 
 - press ENTER : to show the first line and successive ENTER to show successive lines
 - reg 0 a2 : to check content of register a2 0th core
@@ -144,8 +128,7 @@ The contents of the registers can be viewed.
 ### Problem Statement
 
 Write a C program that shows the maximum and minimum values of 64bit unsigned numbers.
-
- c
+```
 #include <stdio.h>
 #include <math.h>
 
@@ -156,11 +139,11 @@ int main(){
 	printf("highest number represented by unsigned 64-bit integer is %llu\n",max);
 	return 0;
 }
-
-<img width="531" alt="image" src="https://github.com/spurthimalode/pes_asic_class/assets/142222859/1e08c5b2-0346-4013-bcae-1c0306c2884d">
+```
+<img width="531" alt="image" src="https://github.com/spurthimalode/pes_asic_class/assets/142222859/eaf0f457-a8f0-4afe-80f1-dfc44f798884">
 
 Write a C program that shows the maximum and minimum values of 64bit signed numbers.
- c
+ ```
 #include <stdio.h>
 #include <math.h>
 
@@ -171,8 +154,8 @@ int main(){
 	printf("highest number represented by signed 64-bit integer is %lld\n",max);
 	return 0;
 }
-
-<img width="531" alt="image" src="https://github.com/spurthimalode/pes_asic_class/assets/142222859/a3ed2f0a-ae3c-459b-838f-d9d9e644ba4f">
+```
+<img width="531" alt="image" src="https://github.com/spurthimalode/pes_asic_class/assets/142222859/aa0fe64b-43a1-4977-b76d-9ca59cf78f67">
 
 
 </details>
@@ -181,7 +164,7 @@ int main(){
 <br>
 
 [](https://github.com/spurthimalode/PES_ASIC_CLASS#links-for-easy-navigation)
-*Introduction to ABI and Basic Verification Flow*
+**Introduction to ABI and Basic Verification Flow**
 + Application Binary Interface
   
   <img width="553" alt="image" src="https://github.com/spurthimalode/pes_asic_class/assets/142222859/4411b4fa-c502-43c9-8de9-46c71199f34b">
@@ -197,12 +180,12 @@ In big-endian representation, you store the most significant byte (MSB) at the l
 #### For example, consider the 64-bit hexadecimal value 0x0123456789ABCDEF. 
 In Little-Endian representation, it would be stored as follows in memory:
 
-<img width="353" alt="image" src="https://github.com/spurthimalode/pes_asic_class/assets/142222859/b64ebad9-e52a-4bf5-8df9-86c0d112ebe3">
+<img width="240" alt="image" src="https://github.com/spurthimalode/pes_asic_class/assets/142222859/b64ebad9-e52a-4bf5-8df9-86c0d112ebe3">
 
 
 In Big-Endian representation, it would be stored as follows in memory:
 
-<img width="353" alt="image" src="https://github.com/spurthimalode/pes_asic_class/assets/142222859/5c1b4ced-8989-4557-b35a-cba5c4523dcc">
+<img width="240" alt="image" src="https://github.com/spurthimalode/pes_asic_class/assets/142222859/5c1b4ced-8989-4557-b35a-cba5c4523dcc">
 
 ## Load, Add and Store Instructions
 Load, Add, and Store instructions are fundamental operations in computer architecture and assembly programming. They are often used to manipulate data within a computer's memory and registers.
@@ -238,7 +221,7 @@ The choice of the number of registers in a processor's architecture, such as the
 #### ABI Names
 ABI names for registers serve as a standardized way to designate the purpose and usage of specific registers within a software ecosystem. These names play a critical role in maintaining compatibility, optimizing code generation, and facilitating communication between different software components. 
 
-<img width="430" alt="image" src="https://github.com/spurthimalode/pes_asic_class/assets/142222859/3e299a64-2dea-455d-bb98-d96c36f97af8">
+<img width="330" alt="image" src="https://github.com/spurthimalode/pes_asic_class/assets/142222859/3e299a64-2dea-455d-bb98-d96c36f97af8">
 
 
 ## Labwork using ABI Function Calls
@@ -253,7 +236,7 @@ ABI names for registers serve as a standardized way to designate the purpose and
 
 *C Program*
 `custom1to9.c`
-   c
+   ```
   #include <stdio.h>
   
   extern int load(int x, int y);
@@ -265,10 +248,10 @@ ABI names for registers serve as a standardized way to designate the purpose and
     result = load(0x0, count+1);
     printf("Sum of numbers from 1 to 9 is %d\n", result);
   }
-
+```
 *Assembly File*
 `load.s`
- s
+ ```
 .section .text
 .global load
 .type load, @function
@@ -286,41 +269,41 @@ addi a3, a3, 1
 blt a3, a2, loop
 add a0, a4, zero
 ret
-
+```
 ### Simulate C Program using Function Call
 *Compilation:* To compile C code and Assembly file use the command
 
-c
+```
 riscv64-unknown-elf-gcc -O1 -mabi=lp64 -march=rv64i -o custom1to9.o custom1to9.c load.s
-
+```
 
 this would generate object file `custom1to9.o`.
 
 *Execution:* To execute the object file run the command 
 
-c
+```
 spike pk custom1to9.o
+```
 
-
-<img width="517" alt="image" src="https://github.com/spurthimalode/pes_asic_class/assets/142222859/bb810c8c-caf3-416a-a709-f6d023a91d99">
+<img width="600" alt="image" src="https://github.com/spurthimalode/pes_asic_class/assets/142222859/c7b675b7-1d34-4a90-8a36-5cf0983fff40">
 
 </details>
 
 
 ## DETAIL DESCRIPTION OF COURSE CONTENT
-*Pseudo Instructions:* Pseudo-instructions are used to simplify programming, improve code readability, and reduce the number of explicit instructions a programmer needs to write. They are especially useful for common programming patterns that involve multiple instructions.
+**Pseudo Instructions:** Pseudo-instructions are used to simplify programming, improve code readability, and reduce the number of explicit instructions a programmer needs to write. They are especially useful for common programming patterns that involve multiple instructions.
 `Ex: li, mv`.
 
-*Base Integer Instructions:* The term "base integer instructions" refers to the fundamental set of instructions that form the foundation for performing basic arithmetic, logical, and data movement operations.
+**Base Integer Instructions:** The term "base integer instructions" refers to the fundamental set of instructions that form the foundation for performing basic arithmetic, logical, and data movement operations.
 `Ex: add, sub, and, or, xor, sll`.
 
-*Multiply Extension Intructions:* The RISC-V architecture includes a set of multiply and multiply-accumulate (MAC) extension instructions that enhance the instruction set to perform efficient multiplication and multiplication-accumulate operations.
+**Multiply Extension Intructions:** The RISC-V architecture includes a set of multiply and multiply-accumulate (MAC) extension instructions that enhance the instruction set to perform efficient multiplication and multiplication-accumulate operations.
 `Ex: mul, mulh, mulhu, mulhsu`.
 
-*Single and Double Precision Floating Point Extension:* The RISC-V architecture includes floating-point extensions that provide support for both single-precision (32-bit) and double-precision (64-bit) floating-point arithmetic operations. These extensions are often referred to as the "F" and "D" extensions, respectively. Floating-point arithmetic is essential for handling real numbers with fractional parts and for performing accurate calculations involving decimal values.
+**Single and Double Precision Floating Point Extension:** The RISC-V architecture includes floating-point extensions that provide support for both single-precision (32-bit) and double-precision (64-bit) floating-point arithmetic operations. These extensions are often referred to as the "F" and "D" extensions, respectively. Floating-point arithmetic is essential for handling real numbers with fractional parts and for performing accurate calculations involving decimal values.
 
-*Application Binary Interface:* ABI stands for "Application Binary Interface." It is a set of rules and conventions that govern how software components interact with each other at the binary level. The ABI defines various aspects of program execution, including how function calls are made, how parameters are passed and returned, how memory is allocated and managed, and more.
+**Application Binary Interface:** ABI stands for "Application Binary Interface." It is a set of rules and conventions that govern how software components interact with each other at the binary level. The ABI defines various aspects of program execution, including how function calls are made, how parameters are passed and returned, how memory is allocated and managed, and more.
 
-*Memory Allocation and Stack Pointer* 
+**Memory Allocation and Stack Pointer** 
 - Memory allocation refers to the process of assigning and managing memory segments for various data structures, variables, and objects used by a program. It involves allocating memory space from the system's memory pool and releasing it when it is no longer needed to prevent memory leaks.
 - The stack pointer is a register used by a program to keep track of the current position of the program's execution on the call stack.
