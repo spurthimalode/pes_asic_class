@@ -287,8 +287,42 @@ spike pk custom1to9.o
 
 <img width="600" alt="image" src="https://github.com/spurthimalode/pes_asic_class/assets/142222859/c7b675b7-1d34-4a90-8a36-5cf0983fff40">
 
-</details>
 
+
+## Lab to Run C-Program on RISCV-CPU
+
+```
+git clone https://github.com/kunalg123/riscv_workshop_collaterals.git
+```
+
+```
+cd riscv_workshop_collaterals
+```
+<img width="517" alt="image" src="https://github.com/spurthimalode/pes_asic_class/assets/142222859/31bb6262-7c4b-4599-a726-798a1123ff0f">
+
+```
+ls -ltr
+```
+
+```
+cd labs
+```
+
+```
+ls -ltr
+```
+<img width="517" alt="image" src="https://github.com/spurthimalode/pes_asic_class/assets/142222859/e064ce16-1c8d-4814-bdb7-50edac41c3fb">
+
+```
+chmod 777 rv32im.sh
+```
+
+```
+./rv32im.sh
+```
+
+<img width="517" alt="image" src="https://github.com/spurthimalode/pes_asic_class/assets/142222859/9ea54069-9163-4451-8f6c-cfa0bd77f261">
+</details>
 
 ## DETAIL DESCRIPTION OF COURSE CONTENT
 **Pseudo Instructions:** Pseudo-instructions are used to simplify programming, improve code readability, and reduce the number of explicit instructions a programmer needs to write. They are especially useful for common programming patterns that involve multiple instructions.
