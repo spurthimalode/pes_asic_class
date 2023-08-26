@@ -2,19 +2,22 @@
 ## OBJECTIVE
 The objective of a course in VLSI (Very Large Scale Integration) Physical Design for ASICs (Application-Specific Integrated Circuits) is to provide us with the knowledge and skills needed to design and implement custom integrated circuits efficiently and effectively. ASICs are specialized integrated circuits designed for specific applications, and physical design in the context of VLSI refers to the process of translating a high-level logic or functional description of a circuit into a physical layout that can be fabricated as a semiconductor device.
 <img width="500" alt="image" src="https://github.com/spurthimalode/pes_asic_class/assets/142222859/f2d490a5-7763-4946-a1a1-906e59c7c87c">
-## INSTALLATION
+
+  
+## TABLE OF CONTENTS
+<details>
+<summary>Introduction to RISCV ISA and GNU Compiler Toolchain</summary>
+<br>
+	
+[](https://github.com/spurthimalode/PES_ASIC_CLASS#links-for-easy-navigation)
+<details>
+<summary>Installation</summary>
+	
 + git clone https://github.com/kunalg123/riscv_workshop_collaterals
 + cd riscv_workshop_collaterals
 + chmod 755 run.sh
 + ./run.sh
-  
-## TABLE OF CONTENTS
-<details>
-<summary>DAY 1</summary>
-<br>
-	
-[](https://github.com/spurthimalode/PES_ASIC_CLASS#links-for-easy-navigation)
-**Introduction to RISCV ISA and GNU Compiler Toolchain**
+</details>
 <details>
 <summary> Introduction </summary>
 	<img width="500" alt="image" src="https://github.com/spurthimalode/pes_asic_class/assets/142222859/b93f1302-4b14-47af-bf81-76761782a4c9"><br>
@@ -160,7 +163,7 @@ int main(){
 
 </details>
 <details>
-<summary>DAY 2</summary>
+<summary>Introduction to ABI and Basic Verification Flow</summary>
 <br>
 
 [](https://github.com/spurthimalode/PES_ASIC_CLASS#links-for-easy-navigation)
@@ -324,6 +327,158 @@ chmod 777 rv32im.sh
 <img width="517" alt="image" src="https://github.com/spurthimalode/pes_asic_class/assets/142222859/9ea54069-9163-4451-8f6c-cfa0bd77f261">
 </details>
 
+<details>
+<summary>RTL Design Using Verilog With SKY130 Technology</summary>
+<br>
+
+<details>
+<summary>DAY 0-- Installation</summary>
+<br>
+	
+**Yosys**
+
+I installed Yosys using the following commands:
+     
+```
+$ git clone https://github.com/YosysHQ/yosys.git
+$ cd yosys-master 
+$ sudo apt install make 
+$ sudo apt-get install build-essential clang bison flex \
+    libreadline-dev gawk tcl-dev libffi-dev git \
+    graphviz xdot pkg-config python3 libboost-system-dev \
+    libboost-python-dev libboost-filesystem-dev zlib1g-dev
+$ make 
+$ sudo make install
+```
+     
+Below is the screenshot showing sucessful launch:
+
+<img width="550" alt="yosys" src="https://github.com/spurthimalode/pes_asic_class/assets/142222859/6f0f5c60-cf08-4687-ab29-b7f165d29978">
+
+
+**Iverilog**
+
+I installed iverilog using the following command:
+
+```
+sudo apt-get install iverilog
+```
+
+Below is the screenshot showing sucessful launch:
+
+<img width="550" alt="iverilog" src="https://github.com/spurthimalode/pes_asic_class/assets/142222859/f67dc762-b04f-4a5b-9c3d-b5494ceb27b8">
+
+ **Gtkwave**
+
+ I installed gtkwave using the following command:
+
+```
+sudo apt-get install gtkwave
+```
+
+Below is the screenshot showing sucessful launch:
+
+<img width="550" alt="gtkwave" src="https://github.com/spurthimalode/pes_asic_class/assets/142222859/2a5bc1c5-e2a7-41c2-97e3-8977fae03792">
+
+**Ngspice**
+
+I downloaded the tarball from https://sourceforge.net/projects/ngspice/files/ to a local directory and unpacked it using the following commands:
+
+```
+tar -zxvf ngspice-41.tar.gz
+cd ngspice-41
+mkdir release
+cd release
+../configure  --with-x --with-readline=yes --disable-debug
+make
+sudo make install
+
+```
+Below is the screenshot showing sucessful launch:
+
+<img width="550" alt="ngspice" src="https://github.com/spurthimalode/pes_asic_class/assets/142222859/38d33e5c-570c-4487-bbaa-a8697e79d026">
+
+
+**Magic**
+
+I installed magic using the following commands:
+
+```
+sudo apt-get install m4
+sudo apt-get install tcsh
+sudo apt-get install csh
+sudo apt-get install libx11-dev
+sudo apt-get install tcl-dev tk-dev
+sudo apt-get install libcairo2-dev
+sudo apt-get install mesa-common-dev libglu1-mesa-dev
+sudo apt-get install libncurses-dev
+sudo apt install magic
+```
+Below is the screenshot showing sucessful launch:
+
+<img width="550" alt="magic" src="https://github.com/spurthimalode/pes_asic_class/assets/142222859/02a7c239-a654-4cc2-850e-60ba9bf61fca">
+
+**OpenSTA**
+
+I installed and built OpenSTA (including the needed packages) using the following commands:
+
+```
+sudo apt-get install cmake clang gcctcl swig bison flex
+git clone https://github.com/The-OpenROAD-Project/OpenSTA.git
+cd OpenSTA
+mkdir build
+cd build
+cmake ..
+make
+
+```
+Below is the screenshot showing sucessful launch:
+
+<img width="1085" alt="opensta" src="">
+
+**OpenLANE**
+
+I installed and built OpenLANE (including the needed packages) using the following commands:
+
+```
+sudo apt-get update
+sudo apt-get upgrade
+sudo apt install -y build-essential python3 python3-venv python3-pip make git
+
+sudo apt install apt-transport-https ca-certificates curl software-properties-common
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+
+echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+sudo apt update
+
+sudo apt install docker-ce docker-ce-cli containerd.io
+
+sudo docker run hello-world
+
+sudo groupadd docker
+sudo usermod -aG docker $USER
+sudo reboot 
+
+# After reboot
+docker run hello-world
+
+```
+Below is the screenshot showing sucessful launch:
+
+<img width="1085" alt="openlane" src="https://github.com/alwinshaju08/Alwin_iiitb_asic_class/assets/69166205/ec437280-7862-478b-bfbf-9da7d730892e">
+</details>
+
+<details>
+<summary>DAY 1--Introduction to Verilog RTL design and Synthesis</summary>
+
+
+
+
+ </details>
+
+ </details>
+ 
 ## DETAIL DESCRIPTION OF COURSE CONTENT
 **Pseudo Instructions:** Pseudo-instructions are used to simplify programming, improve code readability, and reduce the number of explicit instructions a programmer needs to write. They are especially useful for common programming patterns that involve multiple instructions.
 `Ex: li, mv`.
