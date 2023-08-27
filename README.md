@@ -656,6 +656,7 @@ To write the netlist
 write_verilog good_mux_netlist.v
 !gvim good_mux_netlist.v
 ```
+![image](https://github.com/spurthimalode/pes_asic_class/assets/142222859/2208f39f-7914-4428-9fc6-96f31cdb1c83)
 
 
 To write a simplified netlist
@@ -663,11 +664,128 @@ To write a simplified netlist
 write_verilog -noattr good_mux_netlist.v
 !gvim good_mux_netlist.v
 ```
+![image](https://github.com/spurthimalode/pes_asic_class/assets/142222859/b90c10a7-9fa0-4993-a03f-03fb9f1ce67b)
+
+</details>
+</details>
+
+<details>
+<summary>Day 2 --Timing libs, hierarchical, flat synthesis, efficient flop coding styles</summary>
+<details>
+<summary>Introduction to timing .libs</summary>
+
+### LAB- Introduction to dot Lib
+This lab guides us through the .lib files where we have all the gates coded in. According to the below parameters the libraries will be characterized to model the variations.
+
+![image](https://github.com/spurthimalode/pes_asic_class/assets/142222859/eb0fc533-1a6f-4ebf-b904-0686cf8f8892)
+
+With in the lib file, the gates are declared as follows to meet the variations due to process, temperatures and voltages.
+
+![image](https://github.com/spurthimalode/pes_asic_class/assets/142222859/325bfcd9-cda3-43c6-9350-402a682dfb4e)
+
+For the above example, for all the 32 cominations i.e 2^5 (5 is no.of variables), the delay, power and all the related parameters for each gate are mentioned.
+
+![image](https://github.com/spurthimalode/pes_asic_class/assets/142222859/efb45b5b-493f-4396-958a-0235eef36cdf)
+
+
+This image displays the power consumtion comparision.
+
+![image](https://github.com/spurthimalode/pes_asic_class/assets/142222859/ce9e3443-76d1-411e-bc34-e4b20c0324dc)
+
+Below image is the delay order for the different flavor of gates.
+
+![image](https://github.com/spurthimalode/pes_asic_class/assets/142222859/b1d09682-fa52-477e-8781-48f4974981b7)
 
 
  </details>
 
- </details>
+  <details>
+<summary> LAB- Hierarchical synthesis and flat synthesis </summary>
+
+**multiple_module**<br />
+
+	module sub_module2 (input a, input b, output y);
+		assign y = a | b;
+	endmodule
+	
+	module sub_module1 (input a, input b, output y);
+		assign y = a&b;
+	endmodule
+
+
+	module multiple_modules (input a, input b, input c , output y);
+	wire net1;
+	sub_module1 u1(.a(a),.b(b),.y(net1));  //net1 = a&b
+	sub_module2 u2(.a(net1),.b(c),.y(y));  //y = net1|c ,ie y = a&b + c;
+	endmodule
+
+This is the schematic as per the connections in the above module.
+
+![image](https://github.com/spurthimalode/pes_asic_class/assets/142222859/809949fb-654e-4aa8-9e2c-865a96600951)
+
+Run the below mentioned commands:
+```
+$ yosys
+yosys> read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib 
+yosys> read_verilog multiple_modules.v
+yosys> synth -top multiple_modules
+yosys>abc -liberty ../my_lib/verilog_model/sky130_fd_sc_hd__tt_025C_1v80.lib
+yosys> show multiple_modules 
+
+```
+Below is the snippet showing the synthesis results and synthesized hierarchical circuit for multiple_module.
+
+![image](https://github.com/spurthimalode/pes_asic_class/assets/142222859/eae68e2a-9a22-42c0-bbd6-190d247a057b)
+
+Below is the snippet showing  the hierarchical netlist code for the  multiple_modules:
+```
+write_verilog -noattr multiple_modules_hier.v
+!vim multiple_modules_hier.v
+```
+
+![image](https://github.com/spurthimalode/pes_asic_class/assets/142222859/f3597b73-8932-4b31-a705-d5bf6c231f27)
+
+![image](https://github.com/spurthimalode/pes_asic_class/assets/142222859/92383f5a-9f44-4160-a5fa-9e927aeb592a)
+
+Flattened netlist:
+
+In flattened netlist, the hierarcies are flattend out and there is single module i.e, gates are instantiated directly instead of sub_modules. 
+```
+write_verilog -noattr multiple_modules_fast.v
+!vim multiple_modules_fast.v
+```
+Below is the snippet showing the synthesis results and synthesized flatten circuit for multiple_module.
+
+![image](https://github.com/spurthimalode/pes_asic_class/assets/142222859/97d9f407-0695-4c4c-bfde-2447857a78ae)
+
+Below is the snippet showing  the flatten netlist code for the  multiple_modules:
+
+![image](https://github.com/spurthimalode/pes_asic_class/assets/142222859/bbe806c5-7cdb-430a-bd05-2f024d7bb5eb)
+
+![image](https://github.com/spurthimalode/pes_asic_class/assets/142222859/0937733e-2ba5-4af6-8f7f-c15e553df818)
+
+**submodule synthesis**
+
+Run the below commands:
+```
+$ yosys
+yosys> read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib 
+yosys> read_verilog multiple_modules.v
+yosys> synth -top sub_module1
+yosys>abc -liberty ../my_lib/verilog_model/sky130_fd_sc_hd__tt_025C_1v80.lib
+yosys> show
+
+```
+Below is the snippet showing the synthesis results and synthesized  circuit for sub_module1.
+
+![image](https://github.com/spurthimalode/pes_asic_class/assets/142222859/d8fe8988-86b2-475f-8405-f6a628c0d017)
+
+</details>
+
+
+
+
+
  
 ## DETAIL DESCRIPTION OF COURSE CONTENT
 **Pseudo Instructions:** Pseudo-instructions are used to simplify programming, improve code readability, and reduce the number of explicit instructions a programmer needs to write. They are especially useful for common programming patterns that involve multiple instructions.
