@@ -781,8 +781,234 @@ Below is the snippet showing the synthesis results and synthesized  circuit for 
 ![image](https://github.com/spurthimalode/pes_asic_class/assets/142222859/d8fe8988-86b2-475f-8405-f6a628c0d017)
 
 </details>
+<details>
+	<summary>Various Flop coding styles and optimization</summary>
+	
+**Why Flops and Flop coding styles**
+
+In this session, the discussion was about how to code various types of flops and various styles of coding a flop.
+
+**Why a Flop?**
+
+ In a combinational circuit, the output changes after the propagation delay of the circuit once inputs are changed. During the propagation of data, if there are different paths with different propagation delays, there might be a chance of getting a glitch at the output.<br />
+ If there are multiple combinational circuits in the design, the occurances of glitches are more thereby making the output unstable.<br />
+To curb this drawback, we are going for flops to store the data from the cominational circuits. When a flop is used, the output of combinational circuit is stored in it and is propagated only at the posedge or negedge of the clock so that the next combinational circuit gets a glitch free input thereby stabilising the output.
+ 
+ We use initialize signals or control pins called **set** and **reset** on a flop to initialize the flop, other wise a garbage value to sent out to the next combinational circuit. These control pins can be synchronous or asynchronous.
+
+### Lab- flop synthesis simulations
 
 
+**d-flipflop with asynchronous reset**- Here the output **q** goes low whenever reset is high and will not wait for the clock's posedge, i.e irrespective of clock, the output is changed to low.
+
+	 module dff_asyncres ( input clk ,  input async_reset , input d , output reg q );
+		always @ (posedge clk , posedge async_reset)
+		begin
+			if(async_reset)
+				q <= 1'b0;
+			else	
+				q <= d;
+		end
+	endmodule
+
+**Simulation**:
+Code for Simulation:
+```
+iverilog dff_asyncres.v tb_dff_asyncres.v
+./a.out
+gtkwave tb_dff_asyncres.vcd
+```
+
+![image](https://github.com/spurthimalode/pes_asic_class/assets/142222859/1c23836e-b521-4573-a3ad-b2006fd3d28a)
+
+**Synthesized circuit**:
+Code for Synthesis:
+```
+$ yosys
+yosys> read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib 
+yosys> read_verilog dff_asyncres.v
+yosys> synth -top dff_asyncres
+yosys> dfflibmap -liberty ../my_lib/verilog_model/sky130_fd_sc_hd__tt_025C_1v80.lib
+yosys>abc -liberty ../my_lib/verilog_model/sky130_fd_sc_hd__tt_025C_1v80.lib
+yosys> show
+
+```
+
+![image](https://github.com/spurthimalode/pes_asic_class/assets/142222859/a1ca389d-937d-4ee1-8d8d-eacc33a16f5e)
+
+
+**d-flipflop with asynchronous set**- Here the output **q** goes high whenever set is high and will not wait for the clock's posedge, i.e irrespective of clock, the output is changed to high.
+ 
+
+	module dff_async_set ( input clk ,  input async_set , input d , output reg q );
+		always @ (posedge clk , posedge async_set)
+		begin
+			if(async_set)
+				q <= 1'b1;
+			else
+				q <= d;
+		end
+	endmodule
+
+**Simulation**:
+Code for Simulation:
+```
+iverilog dff_async_set.v tb_dff_async_set.v
+./a.out
+gtkwave tb_dff_async_set.vcd
+```
+
+![image](https://github.com/spurthimalode/pes_asic_class/assets/142222859/cd60741a-de48-464e-97d7-77f23ad6c3e5)
+
+**Synthesized circuit**:
+Code for Synthesis:
+```
+$ yosys
+yosys> read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib 
+yosys> read_verilog dff_async_set.v
+yosys> synth -top dff_async_set
+yosys> dfflibmap -liberty ../my_lib/verilog_model/sky130_fd_sc_hd__tt_025C_1v80.lib
+yosys>abc -liberty ../my_lib/verilog_model/sky130_fd_sc_hd__tt_025C_1v80.lib
+yosys> show
+
+```
+
+![image](https://github.com/spurthimalode/pes_asic_class/assets/142222859/ff454afc-a315-4af6-8a09-1acffae38b60)
+
+
+**d-flipflop with synchronous reset**- Here the output **q** goes low whenever reset is high and at the positive edge of the clock. Here the reset of the output depends on the clock.
+
+
+
+	module dff_syncres ( input clk , input async_reset , input sync_reset , input d , output reg q );
+		always @ (posedge clk )
+		begin
+			if (sync_reset)
+				q <= 1'b0;
+			else	
+				q <= d;
+		end
+	endmodule
+
+**Simulation**:
+Code for Simulation:
+```
+iverilog dff_syncres.v tb_dff_syncres.v
+./a.out
+gtkwave tb_dff_syncres.vcd
+```
+
+![image](https://github.com/spurthimalode/pes_asic_class/assets/142222859/324a6568-2300-4d4d-b0b7-7a53d67a39bb)
+
+**Synthesized circuit**:
+Code for Synthesis:
+```
+$ yosys
+yosys> read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib 
+yosys> read_verilog dff_syncres.v
+yosys> synth -top dff_syncres
+yosys> dfflibmap -liberty ../my_lib/verilog_model/sky130_fd_sc_hd__tt_025C_1v80.lib
+yosys>abc -liberty ../my_lib/verilog_model/sky130_fd_sc_hd__tt_025C_1v80.lib
+yosys> show
+
+```
+![image](https://github.com/spurthimalode/pes_asic_class/assets/142222859/0dfdb64f-9550-4877-971c-4c3f944f3277)
+
+**d-flipflop with synchronous and asynchronbous reset**- Here the output **q** goes low whenever asynchronous reset is high where output doesn't depend on clock and also when synchronous reset is high and posedge of clock occurs.
+
+
+	module dff_asyncres_syncres ( input clk , input async_reset , input sync_reset , input d , output reg q );
+		always @ (posedge clk , posedge async_reset)
+		begin
+			if(async_reset)
+				q <= 1'b0;
+			else if (sync_reset)
+				q <= 1'b0;
+			else	
+				q <= d;
+		end
+	endmodule
+
+**Simulation**:
+Code for Simulation:
+```
+iverilog dff_asyncres_syncres.v tb_dff_asyncres_syncres.v
+
+./a.out
+gtkwave tb_dff_asyncres_syncres.vcd
+```
+
+![image](https://github.com/spurthimalode/pes_asic_class/assets/142222859/c25e19ea-c5ff-4f81-adff-d4e3d0dfa078)
+
+**Synthesized circuit**:
+Code for Synthesis:
+```
+$ yosys
+yosys> read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib 
+yosys> read_verilog dff_asyncres_syncres.v
+yosys> synth -top dff_asyncres_syncres
+yosys> dfflibmap -liberty ../my_lib/verilog_model/sky130_fd_sc_hd__tt_025C_1v80.lib
+yosys>abc -liberty ../my_lib/verilog_model/sky130_fd_sc_hd__tt_025C_1v80.lib
+yosys> show
+
+```
+
+![image](https://github.com/spurthimalode/pes_asic_class/assets/142222859/b0083a53-4f76-4c96-ad39-69acbe74c638)
+
+</details>
+
+<details>
+	
+<summary> Interesting optimisations </summary>
+
+This lab session deals with some automatic and interesting optimisations of the circuits based on logic. In the below example, multiplying a number with 2 doesn't need any additional hardeware and only needs connecting the bits from **a** to **y** and grounding the LSB bit of y is enough and the same is realized by Yosys.
+
+	module mul2 (input [2:0] a, output [3:0] y);
+		assign y = a * 2;
+	endmodule
+
+**Synthesized circuit**:
+
+![image](https://github.com/spurthimalode/pes_asic_class/assets/142222859/46726dc9-c2df-4240-a0db-6c0476ec104e)
+
+
+**Netlist for the above schematic**
+
+![image](https://github.com/spurthimalode/pes_asic_class/assets/142222859/23ad2a7d-4494-4f29-9e07-9f73ca2c4214)
+
+
+Special case of multiplying **a** with **9**. 
+
+The schematic for the same is shown below:
+
+![image](https://github.com/spurthimalode/pes_asic_class/assets/142222859/4e9a643c-ca9c-48ba-8a98-19277c4f16bc)
+
+
+**Netlist for the above schematic**
+
+![image](https://github.com/spurthimalode/pes_asic_class/assets/142222859/1a36f861-d422-4af8-afa8-d77f5341e357)
+
+</details>
+
+</details>
+
+<details>
+<summary>Day 3--Combinational and sequential optmizations</summary>
+	
+<details>
+<summary> Combinational logic optimization with examples </summary>
+
+Optimising the combinational logic circuit is squeezing the logic to get the most optimized digital design so that the circuit finally is area and power efficient. This is achieved by the synthesis tool using various techniques and gives us the most optimized circuit.
+
+**Techniques for optimization**:
+- Constant propagation which is Direct optimizxation technique
+- Boolean logic optimization using K-map or Quine McKluskey
+
+
+</details>
+
+ 
+</details>
 
 
 
