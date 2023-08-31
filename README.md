@@ -995,23 +995,475 @@ The schematic for the same is shown below:
 <details>
 <summary>Day 3--Combinational and sequential optmizations</summary>
 	
+## Logic Optimisation
+
+- *Combinational Logic Optimisation*
+	- Constant Propogation
+	- Boolean logic Optimisation
+- *Sequential Logic Optimisation*
+	- Sequential constant propogation
+	- State optimisation
+	- Retiming
+	- Sequential logic cloning
+
 <details>
-<summary> Combinational logic optimization with examples </summary>
+<summary>Combinational Logic Optimisation</summary>
+	
+Command to optimize the circuit by yosys is ``yosys> opt_clean -purge``
 
-Optimising the combinational logic circuit is squeezing the logic to get the most optimized digital design so that the circuit finally is area and power efficient. This is achieved by the synthesis tool using various techniques and gives us the most optimized circuit.
+ ## Example 1
+ ```
+ module opt_check (input a , input b , output y);
+		assign y = a?b:0;
+	endmodule
+```
+Use the below commands to get the optimized circuit:
+```
+yosys:read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib 
+yosys:read_verilog opt_check.v
+yosys:synth -top opt_check
+yosys:opt_clean -purge
+yosys:abc -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib 
+yosys:show
 
-**Techniques for optimization**:
-- Constant propagation which is Direct optimizxation technique
-- Boolean logic optimization using K-map or Quine McKluskey
+```
+**Optimized circuit**
+
+![opt-check](https://github.com/spurthimalode/pes_asic_class/assets/142222859/a384418d-3ded-40b6-89b4-ef80b15dc30a)
+
+
+## Example 2
+```
+module opt_check2 (input a , input b , output y);
+		assign y = a?1:b;
+	endmodule
+```
+Use the below commands to get the optimized circuit:
+```
+yosys:read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib 
+yosys:read_verilog opt_check2.v
+yosys:synth -top opt_check2
+yosys:opt_clean -purge
+yosys:abc -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib 
+yosys:show
+
+```
+**Optimized circuit**
+
+![image](https://github.com/spurthimalode/pes_asic_class/assets/142222859/67f6deac-ed24-4826-8631-ac2197a12117)
+
+
+ **Example 3**
+```
+	module opt_check3 (input a , input b, input c , output y);
+		assign y = a?(c?b:0):0;
+	endmodule
+```
+Use the below commands to get the optimized circuit:
+```
+yosys:read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib 
+yosys:read_verilog opt_check3.v
+yosys:synth -top opt_check3
+yosys:opt_clean -purge
+yosys:abc -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib 
+yosys:show
+
+```
+**Optimized circuit**
+
+![image](https://github.com/spurthimalode/pes_asic_class/assets/142222859/e7ec7102-64ed-4401-aa28-bcf2c6fd329f)
+
+ **Example-4**
+```
+	module opt_check4 (input a , input b , input c , output y);
+		assign y = a?(b?(a & c ):c):(!c);
+	endmodule
+```
+Use the below commands to get the optimized circuit:
+```
+yosys:read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib 
+yosys:read_verilog opt_check4.v
+yosys:synth -top opt_check4
+yosys:opt_clean -purge
+yosys:abc -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib 
+yosys:show
+
+```
+**Optimized circuit**
+
+![image](https://github.com/spurthimalode/pes_asic_class/assets/142222859/ebc10cba-3743-45cb-a78e-2af7d0bc5a94)
+
+**Example 5**
+```
+ module sub_module1(input a , input b , output y);
+		 assign y = a & b;
+		endmodule
+
+		module sub_module2(input a , input b , output y);
+		 assign y = a^b;
+		endmodule
+
+		module multiple_module_opt(input a , input b , input c , input d , output y);
+		wire n1,n2,n3;
+		sub_module1 U1 (.a(a) , .b(1'b1) , .y(n1));
+		sub_module2 U2 (.a(n1), .b(1'b0) , .y(n2));
+		sub_module2 U3 (.a(b), .b(d) , .y(n3));
+
+		assign y = c | (b & n1); 
+		endmodule
+```
+Use the below commands to get the optimized circuit:
+```
+yosys:read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib 
+yosys:read_verilog multiple_module_opt.v
+yosys:synth -top multiple_module_opt
+yosys:abc -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib 
+yosys:flatten
+yosys:opt_clean -purge
+yosys:show
+
+```
+
+**Optimized circuit**
+![image](https://github.com/spurthimalode/pes_asic_class/assets/142222859/813f55c3-ef22-4d72-b186-4f425b3c4240)
+
+
+**Example 6**
+```
+module sub_module(input a , input b , output y);
+		assign y = a & b;
+	endmodule
+
+	module multiple_module_opt2(input a , input b , input c , input d , output y);
+		wire n1,n2,n3;
+		sub_module U1 (.a(a) , .b(1'b0) , .y(n1));
+		sub_module U2 (.a(b), .b(c) , .y(n2));
+		sub_module U3 (.a(n2), .b(d) , .y(n3));
+		sub_module U4 (.a(n3), .b(n1) , .y(y));
+	endmodule
+```
+Use the below commands to get the optimized circuit:
+```
+yosys:read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib 
+yosys:read_verilog multiple_module_opt2.v
+yosys:synth -top multiple_module_opt2
+yosys:abc -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib 
+yosys:flatten
+yosys:opt_clean -purge
+yosys:show
+
+```
+**Optimized circuit**
+![image](https://github.com/spurthimalode/pes_asic_class/assets/142222859/5f68ccd1-f282-4f83-8da8-ef0084db9819)
+</details>
+
+<details>
+<summary>Sequential Logic Optimization</summary>
+	
+**Example 1**
+
+```
+	module dff_const1(input clk, input reset, output reg q);
+		always @(posedge clk, posedge reset)
+		begin
+			if(reset)
+				q <= 1'b0;
+			else
+				q <= 1'b1;
+		end
+	endmodule
+```
+**Simulation**
+Code for Simulation:
+```
+iverilog dff_const1.v tb_dff_const1.v
+./a.out
+gtkwave ttb_dff_const1.vcd
+```
+
+![image](https://github.com/spurthimalode/pes_asic_class/assets/142222859/2c9c713e-69f0-4e40-b7b1-95dbf69490f5)
+
+**Synthesis**<br />
+Code for Synthesis:
+```
+$ yosys
+yosys> read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib 
+yosys> read_verilog dff_const1.v
+yosys> synth -top dff_const1
+yosys> dfflibmap -liberty ../my_lib/verilog_model/sky130_fd_sc_hd__tt_025C_1v80.lib
+yosys>abc -liberty ../my_lib/verilog_model/sky130_fd_sc_hd__tt_025C_1v80.lib
+yosys> show
+
+```
+
+![image](https://github.com/spurthimalode/pes_asic_class/assets/142222859/a4fd820f-237f-43e4-979d-52a570689a8e)
+
+**Example 2**
+
+```
+	module dff_const2(input clk, input reset, output reg q);
+		always @(posedge clk, posedge reset)
+		begin
+			if(reset)
+				q <= 1'b1;
+			else
+				q <= 1'b1;
+		end
+	endmodule
+```
+
+
+**Simulation**
+Code for Simulation:
+```
+iverilog dff_const2.v tb_dff_const2.v
+./a.out
+gtkwave ttb_dff_const2.vcd
+```
+
+![image](https://github.com/spurthimalode/pes_asic_class/assets/142222859/98183793-169c-4c1b-9846-15f6523bb31a)
+
+**Synthesis**
+Code for Synthesis:
+```
+$ yosys
+yosys> read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib 
+yosys> read_verilog dff_const2.v
+yosys> synth -top dff_const2
+yosys> dfflibmap -liberty ../my_lib/verilog_model/sky130_fd_sc_hd__tt_025C_1v80.lib
+yosys>abc -liberty ../my_lib/verilog_model/sky130_fd_sc_hd__tt_025C_1v80.lib
+yosys> show
+
+```
+![image](https://github.com/spurthimalode/pes_asic_class/assets/142222859/c881e953-a920-4946-ac65-a60361584a73)
+
+**Example 3**
+```
+		module dff_const3(input clk, input reset, output reg q);
+		reg q1;
+
+		always @(posedge clk, posedge reset)
+		begin
+			if(reset)
+			begin
+				q <= 1'b1;
+				q1 <= 1'b0;
+			end
+			else
+			begin
+				q1 <= 1'b1;
+				q <= q1;
+			end
+		end
+		endmodule
+
+```
+**Simulation***
+Code for Simulation:
+```
+iverilog dff_const3.v tb_dff_const3.v
+./a.out
+gtkwave ttb_dff_const3.vcd
+```
+
+![image](https://github.com/spurthimalode/pes_asic_class/assets/142222859/5dba1ba8-33c2-49e7-a388-59f4d1fea34d)
+
+**Synthesis**
+Code for Synthesis:
+```
+$ yosys
+yosys> read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib 
+yosys> read_verilog dff_const3.v
+yosys> synth -top dff_const3
+yosys> dfflibmap -liberty ../my_lib/verilog_model/sky130_fd_sc_hd__tt_025C_1v80.lib
+yosys>abc -liberty ../my_lib/verilog_model/sky130_fd_sc_hd__tt_025C_1v80.lib
+yosys> show
+
+```
+![image](https://github.com/spurthimalode/pes_asic_class/assets/142222859/6dd70b1a-33f5-4d28-b25f-51b0acaa9456)
+
+**Example 4**
+```
+		module dff_const4(input clk, input reset, output reg q);
+		reg q1;
+
+		always @(posedge clk, posedge reset)
+		begin
+			if(reset)
+			begin
+				q <= 1'b1;
+				q1 <= 1'b1;
+			end
+		else
+			begin
+				q1 <= 1'b1;
+				q <= q1;
+			end
+		end
+		endmodule
+```
+
+**Simulation**
+Code for Simulation:
+```
+iverilog dff_const4.v tb_dff_const4.v
+./a.out
+gtkwave ttb_dff_const4.vcd
+```
+
+![image](https://github.com/spurthimalode/pes_asic_class/assets/142222859/84dea230-b439-414d-aa27-5d6d16f8117e)
+
+**Synthesis**
+Code for Synthesis:
+```
+$ yosys
+yosys> read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib 
+yosys> read_verilog dff_const4.v
+yosys> synth -top dff_const4
+yosys> dfflibmap -liberty ../my_lib/verilog_model/sky130_fd_sc_hd__tt_025C_1v80.lib
+yosys>abc -liberty ../my_lib/verilog_model/sky130_fd_sc_hd__tt_025C_1v80.lib
+yosys> show
+
+```
+![image](https://github.com/spurthimalode/pes_asic_class/assets/142222859/7c7fc484-2612-44b1-9ddf-fd8f95baafff)
+
+**Example5**
+```
+		module dff_const5(input clk, input reset, output reg q);
+		reg q1;
+		always @(posedge clk, posedge reset)
+			begin
+				if(reset)
+				begin
+					q <= 1'b0;
+					q1 <= 1'b0;
+				end
+			else
+				begin
+					q1 <= 1'b1;
+					q <= q1;
+				end
+			end
+		endmodule
+```
+
+**Simulation**
+Code for Simulation:
+```
+iverilog dff_const5.v tb_dff_const5.v
+./a.out
+gtkwave ttb_dff_const5.vcd
+```
+
+![image](https://github.com/spurthimalode/pes_asic_class/assets/142222859/dd7cf383-197f-4898-aba7-769042d3d424)
+
+**Synthesis**
+Code for Synthesis:
+```
+$ yosys
+yosys> read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib 
+yosys> read_verilog dff_const5.v
+yosys> synth -top dff_const5
+yosys> dfflibmap -liberty ../my_lib/verilog_model/sky130_fd_sc_hd__tt_025C_1v80.lib
+yosys>abc -liberty ../my_lib/verilog_model/sky130_fd_sc_hd__tt_025C_1v80.lib
+yosys> show
+
+```
+
+![image](https://github.com/spurthimalode/pes_asic_class/assets/142222859/07c44886-2591-40a3-88d6-13242f163c21)
+
+</details>
+<details>
+<summary> Sequential optimisation of unused outputs </summary>
+
+**Example1**
+```
+		module counter_opt (input clk , input reset , output q);
+		reg [2:0] count;
+		assign q = count[0];
+		always @(posedge clk ,posedge reset)
+		begin
+			if(reset)
+				count <= 3'b000;
+			else
+				count <= count + 1;
+		end
+		endmodule
+```
+
+**Synthesis**
+Code for Synthesis:
+```
+$ yosys
+yosys> read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib 
+yosys> read_verilog counter_opt.v
+yosys> synth -top counter_opt
+yosys> dfflibmap -liberty ../my_lib/verilog_model/sky130_fd_sc_hd__tt_025C_1v80.lib
+yosys>abc -liberty ../my_lib/verilog_model/sky130_fd_sc_hd__tt_025C_1v80.lib
+yosys> show
+
+```
+![image](https://github.com/spurthimalode/pes_asic_class/assets/142222859/244f757e-8a1a-4bfa-947b-3f87b76a98b3)
+
+**Updated counter logic-** 
+```
+	module counter (input clk , input reset , output q);
+		reg [2:0] count;
+		assign q = {count[2:0]==3'b100};
+		always @(posedge clk ,posedge reset)
+		begin
+		if(reset)
+			count <= 3'b000;
+		else
+			count <= count + 1;
+		end
+	endmodule
+```
+**Synthesis**
+Code for Synthesis:
+```
+$ yosys
+yosys> read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib 
+yosys> read_verilog counter.v
+yosys> synth -top counter
+yosys> dfflibmap -liberty ../my_lib/verilog_model/sky130_fd_sc_hd__tt_025C_1v80.lib
+yosys>abc -liberty ../my_lib/verilog_model/sky130_fd_sc_hd__tt_025C_1v80.lib
+yosys> show
+
+```
+All the other blocks in synthesizer are for incrementing the counter but the output is only from the three input NOR gate.
+
+![image](https://github.com/spurthimalode/pes_asic_class/assets/142222859/43a8c99a-048d-4f9f-83b1-b156f1e6cc46)
+
+![image](https://github.com/spurthimalode/pes_asic_class/assets/142222859/3047b48d-c80e-43f1-9840-579b0f3ea434)
+
+</details>
+</details>
+
+<details> 
+<summary>Day 4--GLS,blocking vs non-blocking and Synthesis-Simulation mismatch</summary>
+
+### GLS Concepts And Flow Using Iverilog
+
+**What is GLS- Gate Level Simulation?**:<br />
+GLS is generating the simulation output by running test bench with netlist file generated from synthesis as design under test. Netlist is logically same as RTL code, therefore, same test bench can be used for it.
+
+**Why GLS?**:<br />
+We perform this to verify logical correctness of the design after synthesizing it. Also ensuring the timing of the design is met.
+
+Below picture gives an insight of the procedure. Here while using iverilog, we also include gate level verilog models to generate GLS simulation.
+
+![image](https://github.com/spurthimalode/pes_asic_class/assets/142222859/ef05e2b8-48f4-46ed-911c-1a17d331a780)
+
+### Synthesis Simulation Mismatch
+
+There are three main reasons for Synthesis Simulation Mismatch:<br />
+- Missing sensitivity list in always block
+- Blocking vs Non-Blocking Assignments
+- Non standard Verilog coding
 
 
 </details>
-
- 
-</details>
-
-
-
  
 ## DETAIL DESCRIPTION OF COURSE CONTENT
 **Pseudo Instructions:** Pseudo-instructions are used to simplify programming, improve code readability, and reduce the number of explicit instructions a programmer needs to write. They are especially useful for common programming patterns that involve multiple instructions.
