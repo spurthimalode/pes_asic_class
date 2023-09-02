@@ -418,24 +418,6 @@ Below is the screenshot showing sucessful launch:
 
 <img width="550" alt="magic" src="https://github.com/spurthimalode/pes_asic_class/assets/142222859/02a7c239-a654-4cc2-850e-60ba9bf61fca">
 
-**OpenSTA**
-
-I installed and built OpenSTA (including the needed packages) using the following commands:
-
-```
-sudo apt-get install cmake clang gcctcl swig bison flex
-git clone https://github.com/The-OpenROAD-Project/OpenSTA.git
-cd OpenSTA
-mkdir build
-cd build
-cmake ..
-make
-
-```
-Below is the screenshot showing sucessful launch:
-
-<img width="1085" alt="opensta" src="---">
-
 **OpenLANE**
 
 I installed and built OpenLANE (including the needed packages) using the following commands:
@@ -1462,6 +1444,139 @@ There are three main reasons for Synthesis Simulation Mismatch:<br />
 - Blocking vs Non-Blocking Assignments
 - Non standard Verilog coding
 
+<details>
+	<summary> Lab- GLS Synth Sim Mismatch </summary>
+
+ **Example-1** There is no mismatch in this example as the netlist simulation and rtl simulation waveform are similar only
+```
+	module ternary_operator_mux (input i0 , input i1 , input sel , output y);
+		assign y = sel?i1:i0;
+	endmodule
+```
+	
+**Simulation**
+Use the below commands for simulation:
+```
+iverilog ternary_operator_mux.v tb_ternary_operator_mux.v
+./a.out
+gtkwave tb_ternary_operator_mux.vcd
+```
+
+![image](https://github.com/spurthimalode/pes_asic_class/assets/142222859/0b1f7709-3d68-424e-aa08-3e71081d53dd)
+
+**Synthesis**
+Code for synthesis:
+```
+read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+read_verilog ternary_operator_mux.v
+synth -top ternary_operator_mux
+abc -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+show
+```
+
+![image](https://github.com/spurthimalode/pes_asic_class/assets/142222859/43cb894a-459f-4fe5-9fc1-e665c582737c)
+
+**Netlist Simulation**
+Code for netlist simulation:
+```
+iverilog ../my_lib/verilog_model/primitives.v ../my_lib/verilog_model/sky130_fd_sc_hd.v ternary_operator_mux_net.v tb_ternary_operator_mux.v
+./a.out
+gtkwave tb_bad_mux.vcd
+```
+
+![image](https://github.com/spurthimalode/pes_asic_class/assets/142222859/46fc8b05-babf-47c5-8b92-bc4477f84c49)
+
+**Example 2**
+```
+module bad_mux (input i0 , input i1 , input sel , output reg y);
+		always @ (sel)
+		begin
+			if(sel)
+				y <= i1;
+			else 
+				y <= i0;
+		end
+	endmodule
+```
+
+**Simulation**
+Code for simulation:
+```
+iverilog bad_mux.v tb_bad_mux.v
+./a.out
+gtkwave tb_bad_mux.vcd
+```
+
+![image](https://github.com/spurthimalode/pes_asic_class/assets/142222859/8f4e4439-ea51-4cc8-9931-9a3a61b21616)
+
+**Synthesis**
+Code for synthesis:
+```
+read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+read_verilog bad_mux.v
+synth -top bad_mux
+abc -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+show
+```
+
+![image](https://github.com/spurthimalode/pes_asic_class/assets/142222859/9cb2a9cf-f91d-4fb5-96e4-03b94f24429e)
+
+**Netlist Simulation**
+Code for netlist Simulation:
+```
+iverilog ../my_lib/verilog_model/primitives.v ../my_lib/verilog_model/sky130_fd_sc_hd.v bad_mux_net.v tb_bad_mux.v
+./a.out
+gtkwave tb_bad_mux.vcd
+```
+
+![image](https://github.com/spurthimalode/pes_asic_class/assets/142222859/017f2232-8fd9-47f8-b22e-cede646840a3)
+</details>
+
+<details>
+	<summary>Lab- Synthesis simulation mismatch blocking statement</summary>
+
+ Here the output is depending on the past value of x which is dependednt on a and b and it appears like a flop.
+```
+	module blocking_caveat (input a , input b , input  c, output reg d); 
+	reg x;
+	always @ (*)
+		begin
+		d = x & c;
+		x = a | b;
+	end
+	endmodule
+```
+**Simulation**
+Code for Simulation:
+```
+iverilog blocking_caveat.v tb_blocking_caveat.v
+./a.out
+gtkwave tb_blocking_caveat.vcd
+```
+![image](https://github.com/spurthimalode/pes_asic_class/assets/142222859/8c297f67-e56d-43ba-a66b-f59d1f7f1166)
+
+**Synthesis**
+Code for Synthesis:
+```
+read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+read_verilog blocking_caveat.v
+synth -top blocking_caveat
+abc -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+show
+```
+
+![image](https://github.com/spurthimalode/pes_asic_class/assets/142222859/84f3a113-c18a-4077-8379-0b5ac28d58cd)
+
+**Netlist Simulation**
+Code for netlist simulation:
+```
+iverilog ../my_lib/verilog_model/primitives.v ../my_lib/verilog_model/sky130_fd_sc_hd.v blocking_caveat_net.v tb_blocking_caveat.v
+./a.out
+gtkwave tb_blocking_caveat.vcd
+```
+![image](https://github.com/spurthimalode/pes_asic_class/assets/142222859/4d24ac9b-7e44-42db-a9ef-83712e127136)
+
+</details>
 
 </details>
  
